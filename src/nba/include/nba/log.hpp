@@ -66,8 +66,8 @@ inline void Log(std::string_view format, Args&&... args) {
       prefix = "[F]";
     }
 
-    const auto& style_ref = style;
-    fmt::print(style_ref, "{} {}\n", prefix, fmt::format(format, std::forward<Args>(args)...));
+    const auto formatted = fmt::vformat(format, fmt::make_format_args(args...));
+    fmt::print(style, "{} {}\n", prefix, formatted);
   }
 }
 
