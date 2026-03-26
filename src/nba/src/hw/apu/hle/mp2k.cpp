@@ -314,16 +314,12 @@ void MP2K::RenderReverb(float* destination, u8 strength) {
     { 0.35, 0.35 }
   };
 
-  static constexpr float k_normalize_coefficients = []() constexpr {
-    float sum = 0.0;
-
-    for(auto pair : k_late_coefficients) {
-      sum += pair[0];
-      sum += pair[1];
-    } 
-
-    return 1.0 / sum;
-  }();
+  static constexpr float k_normalize_coefficients =
+    1.0f / (
+        k_late_coefficients[0][0] + k_late_coefficients[0][1] +
+        k_late_coefficients[1][0] + k_late_coefficients[1][1] +
+        k_late_coefficients[2][0] + k_late_coefficients[2][1]
+    );
 
   const auto early_buffer = &buffer[((current_frame + k_total_frame_count - 1) % k_total_frame_count) * k_samples_per_frame * 2];
 
