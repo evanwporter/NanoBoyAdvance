@@ -192,47 +192,6 @@ Scheduler& Core::GetScheduler() {
   return scheduler;
 }
 
-void Core::Step() {
-  using HaltControl = Bus::Hardware::HaltControl;
-
-  auto run_one_instruction = [&] {
-    if(cpu.state.r15 == hle_audio_hook) {
-      const u32 sound_info_addr = *bus.GetHostAddress<u32>(0x03007FF0);
-      const auto sound_info = bus.GetHostAddress<MP2K::SoundInfo>(sound_info_addr);
-
-      if(sound_info != nullptr) {
-        apu.GetMP2K().SoundMainRAM(*sound_info);
-      }
-    }
-
-    cpu.Run();
-  };
-
-  if(bus.hw.haltcnt == HaltControl::Run) {
-    run_one_instruction();
-    return;
-  }
-
-  // If the CPU is halted, advance hardware until an IRQ wakes it,
-  // then execute exactly one instruction.
-  while(!irq.ShouldUnhaltCPU()) {
-    if(dma.IsRunning()) {
-      dma.Run();
-      if(irq.ShouldUnhaltCPU()) {
-        break;
-      }
-    } else {
-      bus.Step(scheduler.GetRemainingCycleCount());
-    }
-  }
-
-  if(irq.ShouldUnhaltCPU()) {
-    bus.Step(1);
-    bus.hw.haltcnt = HaltControl::Run;
-    run_one_instruction();
-  }
-}
-
 } // namespace nba::core
 
 auto CreateCore(
