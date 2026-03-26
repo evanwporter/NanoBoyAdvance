@@ -123,6 +123,10 @@ target_include_directories(nba PRIVATE src PUBLIC include)
 
 target_link_libraries(nba PUBLIC fmt::fmt)
 
+if (MSVC)
+  target_compile_options(nba PRIVATE /bigobj)
+endif()
+
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   target_compile_options(nba PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-fbracket-depth=4096>)
 endif()
