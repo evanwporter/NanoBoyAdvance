@@ -65,7 +65,7 @@ inline void Log(std::string_view format, Args&&... args) {
       style = fmt::fg(fmt::terminal_color::red);
       prefix = "[F]";
     }
-    
+
     const auto& style_ref = style;
     fmt::print(style_ref, "{} {}\n", prefix, fmt::vformat(format, fmt::make_format_args(args...)));
   }
