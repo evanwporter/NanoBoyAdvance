@@ -24,6 +24,8 @@ struct Core final : CoreBase {
 
   void Reset() override;
 
+  void Step() override;
+
   void Attach(std::vector<u8> const& bios) override;
   void Attach(ROM&& rom) override;
   auto CreateRTC() -> std::unique_ptr<RTC> override;
@@ -44,6 +46,18 @@ struct Core final : CoreBase {
   auto GetBGVOFS(int id) -> u16 override;
 
   Scheduler& GetScheduler() override;
+
+  arm::ARM7TDMI& GetCPU()  {
+    return cpu;
+  }
+
+  void StepCPU() {
+    cpu.Run();
+  }
+
+  arm::RegisterFile GetCPUState() const& {
+    return cpu.state;
+  }
 
 private:
   void SkipBootScreen();

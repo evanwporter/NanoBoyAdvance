@@ -40,6 +40,8 @@ struct CoreBase {
 
   virtual void Reset() = 0;
 
+  virtual void Step() = 0;
+
   virtual void Attach(std::vector<u8> const& bios) = 0;
   virtual void Attach(ROM&& rom) = 0;
   virtual auto CreateRTC() -> std::unique_ptr<RTC> = 0;

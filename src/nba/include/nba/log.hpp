@@ -40,7 +40,7 @@ template<Level level, typename... Args>
 inline void Log(std::string_view format, Args&&... args) {
   if constexpr((detail::kLogMask & level) != 0) {
     fmt::text_style style = {};
-    char const* prefix = "[?]";
+    const char* prefix = "[?]";
 
     if constexpr(level == Trace) {
       style = fmt::fg(fmt::terminal_color::cyan);
@@ -50,10 +50,10 @@ inline void Log(std::string_view format, Args&&... args) {
       style = fmt::fg(fmt::terminal_color::blue);
       prefix = "[D]";
     }
-    if constexpr(level ==  Info) {
+    if constexpr(level == Info) {
       prefix = "[I]";
     }
-    if constexpr(level ==  Warn) {
+    if constexpr(level == Warn) {
       style = fmt::fg(fmt::terminal_color::yellow);
       prefix = "[W]";
     }
@@ -66,8 +66,13 @@ inline void Log(std::string_view format, Args&&... args) {
       prefix = "[F]";
     }
 
-    const auto& style_ref = style;
-    fmt::print(style_ref, "{} {}\n", prefix, fmt::format(format, std::forward<Args>(args)...));
+    // 👇 Force args to be lvalues (fixes MSVC)
+    auto formatted = fmt::vformat(
+      format,
+      fmt::make_format_args(args...)   // <-- NO std::forward here
+    );
+
+    fmt::print(style, "{} {}\n", prefix, formatted);
   }
 }
 
